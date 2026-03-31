@@ -36,6 +36,7 @@
 #include <platform.h>
 #include <types.h>
 #include <work_on_cpu_callback_args.h>
+#include <linux/version.h>
 
 /**
  * <!-- description -->
@@ -352,7 +353,11 @@ platform_on_each_cpu_forward(platform_per_cpu_func const func) NOEXCEPT
 {
     uint32_t mut_cpu;
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
+    cpus_read_lock();
+#else
     get_online_cpus();
+#endif
     for (mut_cpu = 0; mut_cpu < platform_num_online_cpus(); ++mut_cpu) {
         struct work_on_cpu_callback_args args = {func, mut_cpu, 0, 0};
 
@@ -363,11 +368,19 @@ platform_on_each_cpu_forward(platform_per_cpu_func const func) NOEXCEPT
         }
     }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
+    cpus_read_unlock();
+#else
     put_online_cpus();
+#endif
     return LOADER_SUCCESS;
 
 work_on_cpu_callback_failed:
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
+    cpus_read_unlock();
+#else
     put_online_cpus();
+#endif
     return LOADER_FAILURE;
 }
 
@@ -390,7 +403,11 @@ platform_on_each_cpu_reverse(platform_per_cpu_func const func) NOEXCEPT
 {
     uint32_t mut_cpu;
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
+    cpus_read_lock();
+#else
     get_online_cpus();
+#endif
     for (mut_cpu = platform_num_online_cpus(); mut_cpu > 0; --mut_cpu) {
         struct work_on_cpu_callback_args args = {func, mut_cpu - 1, 0, 0};
 
@@ -401,11 +418,19 @@ platform_on_each_cpu_reverse(platform_per_cpu_func const func) NOEXCEPT
         }
     }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
+    cpus_read_unlock();
+#else
     put_online_cpus();
+#endif
     return LOADER_SUCCESS;
 
 work_on_cpu_callback_failed:
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
+    cpus_read_unlock();
+#else
     put_online_cpus();
+#endif
     return LOADER_FAILURE;
 }
 

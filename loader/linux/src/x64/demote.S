@@ -28,7 +28,12 @@
 
 #define ASSEMBLY
 #include <constants.h>
+#include <linux/version.h>
 #include <asm/unwind_hints.h>
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+    #define UNWIND_HINT_EMPTY UNWIND_HINT_UNDEFINED
+#endif
 
     /** @brief defines the offset of state_save_t.rax */
     #define SS_OFFSET_RAX 0x000

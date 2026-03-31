@@ -27,6 +27,12 @@
 #define ASSEMBLY
 #include <constants.h>
 #include <asm/unwind_hints.h>
+#include <linux/version.h>
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+    #define UNWIND_HINT_EMPTY UNWIND_HINT_UNDEFINED
+#endif
+
 
     .code64
     .intel_syntax noprefix
